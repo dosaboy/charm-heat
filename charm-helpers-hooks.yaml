@@ -12,3 +12,4 @@ include:
         - apache
         - cluster
     - payload.execd
+    - contrib.hardening|inc=*

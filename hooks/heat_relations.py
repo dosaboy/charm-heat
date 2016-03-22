@@ -86,12 +86,14 @@ from heat_context import (
 
 from charmhelpers.contrib.openstack.context import ADDRESS_TYPES
 from charmhelpers.payload.execd import execd_preinstall
+from charmhelpers.contrib.hardening.harden import harden
 
 hooks = Hooks()
 CONFIGS = register_configs()
 
 
 @hooks.hook('install.real')
+@harden()
 def install():
     status_set('maintenance', 'Executing pre-install')
     execd_preinstall()
@@ -113,6 +115,7 @@ def install():
 
 @hooks.hook('config-changed')
 @restart_on_change(restart_map())
+@harden()
 def config_changed():
     if not config('action-managed-upgrade'):
         if openstack_upgrade_available('heat-common'):
@@ -136,6 +139,7 @@ def config_changed():
 
 
 @hooks.hook('upgrade-charm')
+@harden()
 def upgrade_charm():
     leader_elected()
 
@@ -353,6 +357,12 @@ def ha_changed():
             'keystone endpoint configuration')
         for rid in relation_ids('identity-service'):
             identity_joined(rid=rid)
+
+
+@hooks.hook('update-status')
+@harden()
+def update_status():
+    log('Updating status.')
 
 
 def main():
